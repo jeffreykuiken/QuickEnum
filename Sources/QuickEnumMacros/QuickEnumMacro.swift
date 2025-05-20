@@ -5,7 +5,7 @@ import SwiftSyntaxMacros
 import SwiftDiagnostics
 
 /// Implementation of the `Enum` macros.
-public struct QuickEnumMacro: PeerMacro {
+public struct QuickEnumMacro: PeerMacro, DeclarationMacro {
     /// Implementation of the '@Enum' attached macro. It infers the enum name based on the type of
     /// the variable it's attached to.
     public static func expansion(
@@ -51,8 +51,52 @@ public struct QuickEnumMacro: PeerMacro {
         return [DeclSyntax(declaration)]
     }
     
-    // Utility function to generate an enum declaration syntax based on the name of an enum and a
-    // list of cases
+    
+    /// Implementation of the '#enum' freestanding macro. The name of the enum is explicitly
+    /// provided.
+    public static func expansion(
+        of node: some FreestandingMacroExpansionSyntax,
+        in context: some MacroExpansionContext
+    ) throws -> [DeclSyntax] {
+        // Parse the provided enum name, and clean it up (because it could contain leading
+        // and trailing whitespaces
+        guard let nameAttributeSyntax = node.arguments.first?.expression.as(StringLiteralExprSyntax.self),
+              let nameSyntax = nameAttributeSyntax.segments.first?.as(StringSegmentSyntax.self) else {
+            context.diagnose(node: node, message: .couldNotParseEnumName)
+            return []
+        }
+        
+        let enumName = nameSyntax.content.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Verify that the provided name is not an empty string
+        guard !enumName.isEmpty else {
+            context.diagnose(node: node, message: .emptyNameNotAllowed)
+            return []
+        }
+        
+        // Parse the provided cases
+        let caseNames = node.arguments.dropFirst().compactMap {
+            $0.expression.as(StringLiteralExprSyntax.self)?.segments.first?.as(StringSegmentSyntax.self)
+        }
+        
+        // Check if the the cases were provided. If not, we will still generate the user, but
+        // because this is most likely a user error, we show a warning.
+        if caseNames.isEmpty {
+            context.diagnose(node: node, message: .noCasesProvidedWarning)
+        }
+        
+        // Generate the enum syntax, including a short docstring to list the cases
+        guard let declaration = Self.GenerateEnumDeclSyntax(name: enumName, cases: caseNames) else {
+            context.diagnose(node: node, message: .syntaxGenerationFailed)
+            return []
+        }
+        
+        return [DeclSyntax(declaration)]
+    }
+    
+    
+    /// Utility function to generate an enum declaration syntax based on the name of an enum and a
+    /// list of cases
     private static func GenerateEnumDeclSyntax(name: String, cases: [StringSegmentSyntax]) -> EnumDeclSyntax? {
         do {
             let caseList = cases.map({ $0.description }).joined(separator: ", ")

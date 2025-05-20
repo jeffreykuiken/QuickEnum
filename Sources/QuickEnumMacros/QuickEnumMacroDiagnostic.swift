@@ -10,17 +10,23 @@ import SwiftDiagnostics
 enum QuickEnumMacroDiagnostic: String, DiagnosticMessage {
     case requiresVariableDeclaration,
          couldNotInferEnumName,
+         couldNotParseEnumName,
+         emptyNameNotAllowed,
          syntaxGenerationFailed,
          noCasesProvidedWarning
     
     var message: String {
         switch self {
             case .requiresVariableDeclaration:
-                return "@Enum can only be applied to a variable declaration"
+                return "The Enum macro can only be applied to a variable declaration"
             case .couldNotInferEnumName:
-                return "@Enum was unable to infer the enum name based on the type annotation"
+                return "The Enum macro was unable to infer the enum name based on the type annotation"
+            case .couldNotParseEnumName:
+                return "The Enum macro was unable to parse the provided enum name"
+            case .emptyNameNotAllowed:
+                return "Empty enum names are not allowed"
             case .syntaxGenerationFailed:
-                return "@Enum was unable to generate the enum definiton syntax"
+                return "The Enum macro was unable to generate the enum definiton syntax"
             case .noCasesProvidedWarning:
                 return "You have not specified any cases for the generated enum"
         }
