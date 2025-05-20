@@ -1,8 +1,7 @@
 import QuickEnum
 
-let a = 17
-let b = 25
+struct Container {
 
-let (result, code) = #stringify(a + b)
-
-print("The value \(result) was produced by the code \"\(code)\"")
+    @Enum("edit", "new") var viewMode: ViewMode = .edit
+    
+}

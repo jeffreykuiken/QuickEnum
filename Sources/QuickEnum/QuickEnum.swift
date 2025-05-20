@@ -1,11 +1,18 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 
-/// A macro that produces both a value and a string containing the
-/// source code that generated the value. For example,
+/// This macro generates an enum based on the declared type of a variable, and the provided cases.
 ///
-///     #stringify(x + y)
+/// For example,
+/// ```
+/// @Enum("edit", "view") var mode: Mode
+/// ```
 ///
-/// produces a tuple `(x + y, "x + y")`.
-@freestanding(expression)
-public macro stringify<T>(_ value: T) -> (T, String) = #externalMacro(module: "QuickEnumMacros", type: "StringifyMacro")
+/// produces the following enum:
+/// ```
+/// enum Mode {
+///     case edit, view
+/// }
+/// ```
+@attached(peer, names: arbitrary)
+public macro Enum(_ cases: String...) = #externalMacro(module: "QuickEnumMacros", type: "QuickEnumMacro")
