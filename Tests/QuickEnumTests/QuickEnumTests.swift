@@ -10,6 +10,7 @@ import QuickEnumMacros
 
 let testMacros: [String: Macro.Type] = [
     "Enum": QuickEnumMacro.self,
+    "enum": QuickEnumMacro.self,
 ]
 #endif
 
@@ -90,7 +91,7 @@ final class FreestandingMacroTests: XCTestCase {
         #if canImport(QuickEnumMacros)
         assertMacroExpansion(
             """
-            #Enum("GeneratedEnum", cases: "one", "two", "three")
+            #enum("GeneratedEnum", cases: "one", "two", "three")
             """,
             expandedSource: """
             /// GeneratedEnum is a generated enum with the following cases: one, two, three
@@ -111,7 +112,7 @@ final class FreestandingMacroTests: XCTestCase {
         #if canImport(QuickEnumMacros)
         assertMacroExpansion(
             """
-            #Enum("", cases: "one", "two", "three")
+            #enum("", cases: "one", "two", "three")
             """,
             expandedSource: """
             """,
@@ -129,7 +130,7 @@ final class FreestandingMacroTests: XCTestCase {
         #if canImport(QuickEnumMacros)
         assertMacroExpansion(
             """
-            #Enum("GeneratedEnum")
+            #enum("GeneratedEnum")
             """,
             expandedSource: """
             /// GeneratedEnum is a generated enum with the following cases: 

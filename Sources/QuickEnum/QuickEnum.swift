@@ -31,4 +31,4 @@ public macro Enum(_ cases: String...) = #externalMacro(module: "QuickEnumMacros"
 /// }
 /// ````
 @freestanding(declaration, names: arbitrary)
-public macro Enum(_ name: String, cases: String...) = #externalMacro(module: "QuickEnumMacros", type: "QuickEnumMacro")
+public macro `enum`(_ name: String, cases: String...) = #externalMacro(module: "QuickEnumMacros", type: "QuickEnumMacro")
